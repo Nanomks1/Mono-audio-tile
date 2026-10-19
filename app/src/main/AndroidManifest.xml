@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.monotile">
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- الصلاحيات اللازمة لتغيير إعدادات الصوت الأحادي مباشرة -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:label="Mono Audio"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
