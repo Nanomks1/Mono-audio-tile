@@ -5,19 +5,18 @@ plugins {
 
 android {
     namespace 'com.example.monotile'
-    compileSdk 34 // متوافق تماماً مع أندرويد 14 وحتى 16
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.example.monotile"
         minSdk 26
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0"
     }
 
     signingConfigs {
         release {
-            // سيتم قراءة المسار المولد عبر GitHub Action
             storeFile file("keystore.jks")
             storePassword System.getenv("KEYSTORE_PASSWORD")
             keyAlias System.getenv("KEY_ALIAS")
@@ -29,7 +28,14 @@ android {
         release {
             signingConfig signingConfigs.release
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            shrinkResources false
+        }
+    }
+
+    // إلغاء نسخة Debug نهائياً من المشروع
+    variantFilter { variant ->
+        if (variant.buildType.name == 'debug') {
+            setIgnore(true)
         }
     }
 
