@@ -44,7 +44,7 @@ class MonoTileService : TileService() {
         val currentMono = isMonoEnabled()
         val targetValue = if (currentMono) 0 else 1
 
-        // المحاولة 1: التغيير المباشر عبر النظام (يعمل فوراً إذا منحت التطبيق الصلاحية بأي تطبيق خارجي)
+        // المحاولة 1: التغيير المباشر عبر النظام (يعمل فوراً إذا تم منح الصلاحية مسبقاً)
         try {
             val success = Settings.System.putInt(contentResolver, "master_mono", targetValue)
             if (success) {
@@ -52,10 +52,10 @@ class MonoTileService : TileService() {
                 return
             }
         } catch (ignored: Throwable) {
-            // إذا لم يكن يملك الصلاحية المباشرة، ينتقل للمحاولة الثانية تلقائياً
+            // ينتقل للمحاولة الثانية إذا لم تتوفر الصلاحية المباشرة بعد
         }
 
-        // المحاولة 2: استخدام بروتوكول Shizuku/Sui لمنح الصلاحية وتغيير الإعداد
+        // المحاولة 2: استخدام Shizuku أو بدائله لمنح الصلاحية وتغيير الإعداد
         try {
             if (Shizuku.pingBinder()) {
                 if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
@@ -77,7 +77,6 @@ class MonoTileService : TileService() {
         }
     }
 
-    // يمنح التطبيق صلاحية دائمة من أول ضغطة حتى يعمل مستقبلاً بدون الحاجة لتشغيل Shizuku في الخلفية!
     private fun grantSelfPermissionsViaShizuku() {
         try {
             execShizukuCommand("pm grant $packageName android.permission.WRITE_SECURE_SETTINGS")
@@ -85,9 +84,16 @@ class MonoTileService : TileService() {
         } catch (ignored: Throwable) {}
     }
 
-    @Suppress("DEPRECATION")
+    // استدعاء newProcess عبر Reflection لتجاوز قيد private في Shizuku 13.1.5
     private fun execShizukuCommand(command: String) {
-        val process = Shizuku.newProcess(arrayOf("sh", "-c", command), null, null)
+        val method = Shizuku::class.java.getDeclaredMethod(
+            "newProcess",
+            Array<String>::class.java,
+            Array<String>::class.java,
+            String::class.java
+        )
+        method.isAccessible = true
+        val process = method.invoke(null, arrayOf("sh", "-c", command), null, null) as Process
         process.waitFor()
     }
 
