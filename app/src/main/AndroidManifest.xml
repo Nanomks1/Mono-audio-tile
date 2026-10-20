@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- الصلاحيات اللازمة لتغيير إعدادات الصوت الأحادي مباشرة -->
     <uses-permission android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"
@@ -10,14 +9,15 @@
 
     <application
         android:allowBackup="false"
+        android:icon="@drawable/ic_mono_tile"
         android:label="Mono Audio"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
 
         <service
-            android:name=".MonoTileService"
+            android:name="com.example.monotile.MonoTileService"
             android:exported="true"
-            android:icon="@android:drawable/ic_lock_silent_mode_off"
+            android:icon="@drawable/ic_mono_tile"
             android:label="Mono Audio"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
